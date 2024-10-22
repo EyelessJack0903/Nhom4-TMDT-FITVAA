@@ -16,14 +16,16 @@
     "mongodb": "^6.9.0",
     "mongoose": "^8.7.2",
     "multiparty": "^4.2.3",
-    "next": "14.2.15",
+    "next": "^14.2.15",
     "next-auth": "^4.24.8",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-sortable": "^2.0.0",
     "react-sortablejs": "^6.1.4",
     "react-spinners": "^0.14.1",
+    "react-sweetalert2": "^0.6.0",
     "sortablejs": "^1.15.3",
+    "sweetalert2": "^11.14.4",
     "swr": "^2.2.5"
   },
   "devDependencies": {

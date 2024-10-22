@@ -3102,7 +3102,7 @@ mongodb-connection-string-url@^3.0.0:
 
 mongodb@6.9.0, mongodb@^6.9.0:
   version "6.9.0"
-  resolved "https://registry.npmjs.org/mongodb/-/mongodb-6.9.0.tgz"
+  resolved "https://registry.yarnpkg.com/mongodb/-/mongodb-6.9.0.tgz#743ebfff6b3c14b04ac6e00a55e30d4127d3016d"
   integrity sha512-UMopBVx1LmEUbW/QE0Hw18u583PEDVQmUmVzzBRH0o/xtE9DBRA5ZYLOjpLIa03i8FXjzvQECJcqoMvCXftTUA==
   dependencies:
     "@mongodb-js/saslprep" "^1.1.5"
@@ -3182,9 +3182,9 @@ next-auth@^4.24.8:
     preact-render-to-string "^5.1.19"
     uuid "^8.3.2"
 
-next@14.2.15:
+next@^14.2.15:
   version "14.2.15"
-  resolved "https://registry.npmjs.org/next/-/next-14.2.15.tgz"
+  resolved "https://registry.yarnpkg.com/next/-/next-14.2.15.tgz#348e5603e22649775d19c785c09a89c9acb5189a"
   integrity sha512-h9ctmOokpoDphRvMGnwOJAedT6zKhwqyZML9mDtspgf4Rh3Pn7UTYKqePNoDvhsWBAO5GoPNYshnAUGIazVGmw==
   dependencies:
     "@next/env" "14.2.15"
@@ -3543,7 +3543,7 @@ react-dom@16.x.x:
 
 react-dom@^18.3.1:
   version "18.3.1"
-  resolved "https://registry.npmjs.org/react-dom/-/react-dom-18.3.1.tgz"
+  resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-18.3.1.tgz#c2265d79511b57d479b3dd3fdfa51536494c5cb4"
   integrity sha512-5m4nQKp+rZRb09LNH59GM4BxTh9251/ylbKIbpe7TpGxfJ+9kv6BLkLBXIjjspbgbnIBNqlI23tRnTWT0snUIw==
   dependencies:
     loose-envify "^1.1.0"
@@ -3575,6 +3575,13 @@ react-spinners@^0.14.1:
   resolved "https://registry.yarnpkg.com/react-spinners/-/react-spinners-0.14.1.tgz#de7d7d6b3e6d4f29d9620c65495b502c7dd90812"
   integrity sha512-2Izq+qgQ08HTofCVEdcAQCXFEYfqTDdfeDQJeo/HHQiQJD4imOicNLhkfN2eh1NYEWVOX4D9ok2lhuDB0z3Aag==
 
+react-sweetalert2@^0.6.0:
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/react-sweetalert2/-/react-sweetalert2-0.6.0.tgz#b129ca6dfce80dcd2118086287e4545226485976"
+  integrity sha512-4MEWGAJamSfoj56m7MUs7IfBnev9wJYs0RayvoHvxshSQeH62iK0N/EkDiHr3VuZ3vTy34kOpzL1Yg3b3VYF8w==
+  dependencies:
+    sweetalert2 "^11.7.5"
+
 react@16.x.x:
   version "16.14.0"
   resolved "https://registry.yarnpkg.com/react/-/react-16.14.0.tgz#94d776ddd0aaa37da3eda8fc5b6b18a4c9a3114d"
@@ -3586,7 +3593,7 @@ react@16.x.x:
 
 react@^18.3.1:
   version "18.3.1"
-  resolved "https://registry.npmjs.org/react/-/react-18.3.1.tgz"
+  resolved "https://registry.yarnpkg.com/react/-/react-18.3.1.tgz#49ab892009c53933625bd16b2533fc754cab2891"
   integrity sha512-wS+hAgJShR0KhEvPJArfuPVN1+Hz1t0Y6n5jLrGQbkb4urgPE/0Rve+1kMB1v/oWgHgm4WIcV+i7F2pTVj+2iQ==
   dependencies:
     loose-envify "^1.1.0"
@@ -3979,6 +3986,11 @@ supports-preserve-symlinks-flag@^1.0.0:
   version "1.0.0"
   resolved "https://registry.npmjs.org/supports-preserve-symlinks-flag/-/supports-preserve-symlinks-flag-1.0.0.tgz"
   integrity sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==
+
+sweetalert2@^11.14.4, sweetalert2@^11.7.5:
+  version "11.14.4"
+  resolved "https://registry.yarnpkg.com/sweetalert2/-/sweetalert2-11.14.4.tgz#0186439674ea4f15991e41cea3af203ee497853c"
+  integrity sha512-8QMzjxCuinwm18EK5AtYvuhP+lRMRxTWVXy8om9wGlULsXSI4TD29kyih3VYrSXMMBlD4EShFvNC7slhTC7j0w==
 
 swr@^2.2.5:
   version "2.2.5"
