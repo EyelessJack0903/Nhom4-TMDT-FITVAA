@@ -109,11 +109,11 @@ function Categories({ swal }) {
     }
     return (
         <Layout>
-            <h1>Categories</h1>
+            <h1>Loại sản phẩm</h1>
             <label>
                 {editedCategory 
                 ? `Edit category ${editedCategory.name}` 
-                : 'Create new category'}
+                : 'Tạo thương hiệu mới - loại sản phẩm mới'}
             </label>
             <form onSubmit={saveCategory}>
                 <div className="flex gap-1">
@@ -125,19 +125,19 @@ function Categories({ swal }) {
                     <select 
                         onChange={ev => setParentCategory(ev.target.value)}
                         value={parentCategory}>
-                    <option value="">No parent category</option>
+                    <option value="">Loại sản phẩm</option>
                     {categories.length > 0 && categories.map(category => (
                         <option key={category._id} value={category._id}>{category.name}</option>
                     ))}
                     </select>
                 </div>
                 <div className="mb-2">
-                    <label className="block">Properties</label>
+                    <label className="block">Cấu hình</label>
                     <button 
                         onClick={addProperty}
                         type="button" 
                         className="btn-default text-sm mb-2">
-                        Add new property
+                        Thêm cấu hình
                         </button>
                         {properties.length > 0 && properties.map((property,index) => (
                             <div className="flex gap-1 mb-2">
@@ -145,12 +145,12 @@ function Categories({ swal }) {
                                         value={property.name}
                                         className="mb-0"
                                         onChange={ev => handlePropertyNameChange(index,property,ev.target.value)}
-                                        placeholder="property name (example: color)"/>
+                                        placeholder="Thuộc tính (ví dụ: ram, màu sắc, ...)"/>
                                 <input type="text" 
                                         className="mb-0"
                                         onChange={ev => handlePropertyValuesChange(index, property, ev.target.value)}
                                         value={property.values} 
-                                        placeholder="values, comma separated"/>
+                                        placeholder="Thông tin về thuộc tính (ví dụ: 16gb, màu vàng, ...)"/>
                                 <button 
                                 onClick={() => removeProperty(index)}
                                 type="button"
@@ -181,8 +181,8 @@ function Categories({ swal }) {
                 <table className="basic mt-4">
                 <thead>
                     <tr>
-                        <td>Category name</td>
-                        <td>Parent category</td>
+                        <td>Tên thương hiệu</td>
+                        <td>Loại sản phẩm</td>
                         <td></td>
                     </tr>
                 </thead>
