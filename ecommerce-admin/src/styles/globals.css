@@ -5,53 +5,116 @@
 img {
     max-height: 100%;
 }
-input, textarea, select {
+
+input,
+textarea,
+select {
     @apply border border-gray-200 rounded-sm px-1 w-full py-2 px-3;
     @apply mb-2;
 }
 
-input:focus, textarea:focus, select:focus{
+input:focus,
+textarea:focus,
+select:focus {
     @apply border-blue-900;
 }
 
-h1{
+h1 {
     @apply text-gray-800 mb-4 text-xl;
 }
 
-label{
+label {
     @apply text-gray-600 text-sm;
 }
 
-.btn-primary{
+.btn-primary {
     @apply bg-primary text-white px-4 rounded-sm py-1 shadow-sm;
 }
 
-table.basic{
+table.basic {
     @apply w-full bg-white rounded-sm shadow-sm;
 }
 
 table.basic thead tr td,
-table.basic thead tr th
-{
+table.basic thead tr th {
     @apply text-sm text-gray-600 uppercase border-b border-gray-200 px-4 py-2;
 }
 
-table.basic tr td{
+table.basic tr td {
     @apply px-4 py-1;
 }
 
-table.basic a{
-    @apply  px-4 py-1 inline-flex mx-1 items-center gap-1 text-sm;
+table.basic a {
+    @apply px-4 py-1 inline-flex mx-1 items-center gap-1 text-sm;
 }
 
-.btn-red, .btn-default{
+.btn-red,
+.btn-default {
     @apply px-4 py-1 rounded-md;
 }
 
-.btn-red{
+.btn-red {
     @apply bg-red-200 text-red-600 px-4 py-1 rounded-sm shadow-sm;
 }
 
 .btn-default {
-    @apply bg-white text-gray-800 px-4 py-1 rounded-sm border border-gray-200 shadow-sm;  
+    @apply bg-white text-gray-800 px-4 py-1 rounded-sm border border-gray-200 shadow-sm;
+}
+
+.btn-delete {
+    background-color: #f87171;
+    color: white;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    border-radius: 0.375rem;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.btn-delete:hover {
+    background-color: #dc2626;
+    transform: scale(1.05);
+    /* Phóng to nhẹ */
+}
+
+.btn-delete:active {
+    transform: scale(0.95);
+    /* Thu nhỏ nhẹ khi nhấn */
+}
+
+.grid {
+    display: grid;
+    gap: 16px;
+    /* Khoảng cách giữa các ô */
+}
+
+.grid-cols-2 {
+    grid-template-columns: repeat(2, 1fr);
+    /* Hai cột */
+}
+
+.grid-cols-3 {
+    grid-template-columns: repeat(3, 1fr);
+    /* Ba cột */
+}
+
+.border {
+    border: 1px solid #e5e5e5;
+}
+
+.rounded {
+    border-radius: 8px;
+}
+
+.p-2 {
+    padding: 8px;
+}
+
+.mb-4 {
+    margin-bottom: 16px;
+}
+
+.bg-gray-50 {
+    background-color: #f9fafb;
 }

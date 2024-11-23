@@ -6,127 +6,214 @@ import { ReactSortable } from "react-sortablejs";
 
 export default function ProductForm({
     _id,
-    title: existingTitle, 
-    description: existingDescription, 
+    title: existingTitle,
+    description: existingDescription,
     price: existingPrice,
     images: existingImages,
-    category:assignedCategory,
-    properties:assignedProperties,
+    category: assignedCategory,
+    properties: assignedProperties,
+    detailedSpecs: existingDetailedSpecs,
 }) {
-    const [title, setTitle] = useState(existingTitle || '');
-    const [description, setDescription] = useState
-    (existingDescription || '');
-    const [category, setCategory] = useState(assignedCategory || '');
-    const [productProperties,setProductProperties] = useState
-    (assignedProperties || {});
-    const [price, setPrice] = useState(existingPrice || '');
+    const [title, setTitle] = useState(existingTitle || "");
+    const [description, setDescription] = useState(existingDescription || "");
+    const [category, setCategory] = useState(assignedCategory || "");
+    const [productProperties, setProductProperties] = useState(
+        assignedProperties || {}
+    );
+    const [price, setPrice] = useState(existingPrice || "");
     const [images, setImages] = useState(existingImages || []);
     const [goToProducts, setGoToProducts] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
-    const [categories, setCategories] = useState([]); 
+    const [categories, setCategories] = useState([]);
+    const [showDetailedSpecs, setShowDetailedSpecs] = useState(false);
+    const [detailedSpecs, setDetailedSpecs] = useState(
+        existingDetailedSpecs || {
+            CPU: "",
+            RAM: "",
+            "Ổ cứng": "",
+            VGA: "",
+            Display: "",
+            Pin: "",
+            Color: "",
+            "Hệ điều hành": "",
+            "Xuất xứ": "",
+        }
+    );
     const router = useRouter();
 
+    // Fetch categories when component mounts
     useEffect(() => {
-        axios.get('/api/categories').then(result => {
+        axios.get("/api/categories").then((result) => {
             setCategories(result.data);
         });
     }, []);
 
+    // Save product data
     async function saveProduct(ev) {
         ev.preventDefault();
-        const data = { 
-            title, description, price, images, category, 
-            properties:productProperties };
+        const data = {
+            title,
+            description,
+            price,
+            images,
+            category,
+            properties: productProperties,
+            detailedSpecs,
+        };
+        console.log("Sending Data:", data); // Kiểm tra dữ liệu gửi
         if (_id) {
-            // update item
-            await axios.put('/api/products', { ...data, _id });
+            await axios.put("/api/products", { ...data, _id });
         } else {
-            // create item
-            await axios.post('/api/products', data);
+            await axios.post("/api/products", data);
         }
         setGoToProducts(true);
     }
 
     if (goToProducts) {
-        router.push('/products');
+        router.push("/products");
     }
 
+    // Upload images
     async function uploadImages(ev) {
         const files = ev.target?.files;
         if (files?.length > 0) {
             setIsUploading(true);
             const data = new FormData();
             for (const file of files) {
-                data.append('file', file);
+                data.append("file", file);
             }
-            const res = await axios.post('/api/upload', data);
-            setImages(oldImages => {
-                return [...oldImages, ...res.data.links];
-            });
+            const res = await axios.post("/api/upload", data);
+            setImages((oldImages) => [...oldImages, ...res.data.links]);
             setIsUploading(false);
         }
     }
 
+    // Update image order
     function updateImagesOrder(images) {
         setImages(images);
     }
-    function setProductProp(propName,value) {
-        setProductProperties(prev => {
-            const newProductProps = {...prev};
+
+    // Set property for the product
+    function setProductProp(propName, value) {
+        setProductProperties((prev) => {
+            const newProductProps = { ...prev };
             newProductProps[propName] = value;
             return newProductProps;
         });
     }
 
+    // Update detailed specs
+    function updateDetailedSpec(field, value) {
+        setDetailedSpecs((prev) => ({ ...prev, [field]: value }));
+    }
+
+    // Gather all properties from category hierarchy
     const propertiesToFill = [];
     if (categories.length > 0 && category) {
-        let catInfo = categories.find(({_id}) => _id === category);
+        let catInfo = categories.find(({ _id }) => _id === category);
         propertiesToFill.push(...catInfo.properties);
-        while(catInfo?.parent?._id) {
-            const parentCat = categories.find(({_id}) => _id === catInfo?.parent?._id);
+        while (catInfo?.parent?._id) {
+            const parentCat = categories.find(
+                ({ _id }) => _id === catInfo?.parent?._id
+            );
             propertiesToFill.push(...parentCat.properties);
             catInfo = parentCat;
         }
     }
 
+    // Remove individual image
+    function removeImage(link) {
+        setImages((oldImages) => oldImages.filter((img) => img !== link));
+    }
+
     return (
-        <form onSubmit={saveProduct}>
-            <label>Tên sản phẩm</label>
-            <input type="text" 
-                   placeholder="Nhập tên sản phẩm" 
-                   value={title} 
-                   onChange={ev => setTitle(ev.target.value)} />
-            <label>Category</label>
-            <select value={category} 
-                    onChange={ev => setCategory(ev.target.value)}>
+        <form
+            onSubmit={saveProduct}
+            className="p-4 bg-white border rounded shadow-sm"
+        >
+            {/* Header */}
+            <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-semibold">Chi tiết sản phẩm</h2>
+                <button
+                    type="button"
+                    onClick={() => setShowDetailedSpecs(!showDetailedSpecs)}
+                    className="btn-secondary bg-green-400 text-white px-4 py-2 rounded"
+                >
+                    {showDetailedSpecs ? "Ẩn thông số chi tiết" : "Thêm thông số chi tiết"}
+                </button>
+            </div>
+
+            {/* Product Name */}
+            <label className="block mb-2 font-medium">Tên sản phẩm</label>
+            <input
+                type="text"
+                placeholder="Nhập tên sản phẩm"
+                value={title}
+                onChange={(ev) => setTitle(ev.target.value)}
+                className="mb-4 p-2 w-full border rounded"
+            />
+
+            {/* Category Selection */}
+            <label className="block mb-2 font-medium">Category</label>
+            <select
+                value={category}
+                onChange={(ev) => setCategory(ev.target.value)}
+                className="mb-4 p-2 w-full border rounded"
+            >
                 <option value="">Uncategorized</option>
-                {categories.length > 0 && categories.map(c => (
-                    <option key={c._id} value={c._id}>{c.name}</option>
-                ))}
+                {categories.length > 0 &&
+                    categories.map((c) => (
+                        <option key={c._id} value={c._id}>
+                            {c.name}
+                        </option>
+                    ))}
             </select>
-            {propertiesToFill.length > 0 && propertiesToFill.map(p => (
-                <div className="">
-                    <label>{p.name[0].toUpperCase()+p.name.substring(1)}</label>  
-                    <div>
-                    <select value={productProperties[p.name]} 
-                    onChange={ev => 
-                    setProductProp(p.name,ev.target.value)
-                    }>
-                    {p.values.map(v => (
-                        <option value={v}>{v}</option>
-                    ))}
-                  </select>
-                    </div>  
-                </div>
-            ))}
-            <label>Ảnh sản phẩm</label>
-            <div className="mb-2 flex flex-wrap gap-1">
-                <ReactSortable list={images} className="flex flex-wrap gap-1" setList={updateImagesOrder}>
-                    {!!images?.length && images.map(link => (
-                        <div key={link} className="h-24 bg-white p-4 shadow-sm rounded-sm border border-gray-200">
-                            <img src={link} alt="" className="rounded-lg" />
-                        </div>
-                    ))}
+
+            {/* Product Properties */}
+            {propertiesToFill.length > 0 &&
+                propertiesToFill.map((p) => (
+                    <div key={p.name} className="mb-4">
+                        <label>{p.name[0].toUpperCase() + p.name.substring(1)}</label>
+                        <select
+                            value={productProperties[p.name] || ""}
+                            onChange={(ev) =>
+                                setProductProp(p.name, ev.target.value)
+                            }
+                            className="w-full p-2 border rounded"
+                        >
+                            {p.values.map((v) => (
+                                <option key={v} value={v}>
+                                    {v}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                ))}
+
+            {/* Product Images */}
+            <label className="block mb-2 font-medium">Ảnh sản phẩm</label>
+            <div className="mb-4 flex flex-wrap gap-2">
+                <ReactSortable
+                    list={images}
+                    setList={updateImagesOrder}
+                    className="flex flex-wrap gap-2"
+                >
+                    {!!images?.length &&
+                        images.map((link) => (
+                            <div
+                                key={link}
+                                className="h-24 w-24 bg-white p-2 shadow-sm rounded border flex flex-col items-center"
+                            >
+                                <img src={link} alt="" className="rounded-lg mb-2" />
+                                <button
+                                    type="button"
+                                    onClick={() => removeImage(link)}
+                                    className="btn-delete"
+                                >
+                                    Xóa ảnh
+                                </button>
+                            </div>
+                        ))}
                 </ReactSortable>
                 {isUploading && (
                     <div className="h-24 flex items-center">
@@ -134,20 +221,74 @@ export default function ProductForm({
                     </div>
                 )}
                 <label className="w-24 h-24 text-center cursor-pointer flex flex-col items-center justify-center text-sm gap-1 text-primary rounded-lg bg-white shadow-sm border border-primary">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.5}
+                        stroke="currentColor"
+                        className="size-6"
+                    >
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5"
+                        />
                     </svg>
-                    <div>
-                        Tải ảnh
-                    </div>
+                    <div>Tải ảnh</div>
                     <input type="file" className="hidden" onChange={uploadImages} />
                 </label>
             </div>
-            <label>Mô tả</label>
-            <textarea placeholder="Nhập mô tả sản phẩm" value={description} onChange={ev => setDescription(ev.target.value)}></textarea>
-            <label>Giá sản phẩm (VND)</label>
-            <input type="number" placeholder="Nhập giá sản phẩm" value={price} onChange={ev => setPrice(ev.target.value)} />
-            <button type="submit" className="btn-primary">Lưu sản phẩm</button>
+
+            {/* Product Description */}
+            <div className="mt-12">
+                <label className="block mb-2 font-medium">Mô tả</label>
+                <textarea
+                    placeholder="Nhập mô tả sản phẩm"
+                    value={description}
+                    onChange={(ev) => setDescription(ev.target.value)}
+                    className="mb-4 p-2 w-full border rounded"
+                ></textarea>
+            </div>
+
+            {/* Product Price */}
+            <label className="block mb-2 font-medium">Giá sản phẩm (VND)</label>
+            <input
+                type="number"
+                placeholder="Nhập giá sản phẩm"
+                value={price}
+                onChange={(ev) => setPrice(ev.target.value)}
+                className="mb-4 p-2 w-full border rounded"
+            />
+
+            {/* Detailed Specifications */}
+            {showDetailedSpecs && (
+                <div className="mb-4 border rounded p-4 bg-gray-50">
+                    <h2 className="text-md font-medium mb-4">Thông số kỹ thuật</h2>
+                    <div className="grid grid-cols-2 gap-4"> {/* Grid layout */}
+                        {Object.keys(detailedSpecs).map((field) => (
+                            <div key={field} className="flex flex-col">
+                                <label className="font-medium mb-1">{field}</label>
+                                <input
+                                    type="text"
+                                    value={detailedSpecs[field]}
+                                    onChange={(e) => updateDetailedSpec(field, e.target.value)}
+                                    className="p-2 border rounded w-full"
+                                    placeholder={`Nhập ${field}`}
+                                />
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {/* Save Button */}
+            <button
+                type="submit"
+                className="btn-primary bg-blue-500 text-white px-4 py-2 rounded"
+            >
+                Lưu sản phẩm
+            </button>
         </form>
     );
 }

@@ -2,7 +2,7 @@ import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import Logo from "./Logo";
-export default function Nav({show}) {
+export default function Nav({ show }) {
     const inactiveLink = 'flex gap-1 p-1 ';
     const activeLink = inactiveLink + 'bg-highlight text-black rounded-sm';
     const inactiveIcon = 'w-6 h-6';
@@ -14,11 +14,11 @@ export default function Nav({show}) {
         await signOut();
     }
     return (
-        <aside className={(show?'left-0':'-left-full')+" top-0 text-gray-500 p-4 fixed w-full bg-bgGray h-full md:static md:w-auto transition-all"}>
+        <aside className={(show ? 'left-0' : '-left-full') + " top-0 text-gray-500 p-4 fixed w-full bg-bgGray h-full md:static md:w-auto transition-all"}>
             <div className="mb-8 mr-4">
-            <Logo />
+                <Logo />
             </div>
-            
+
             <nav className="flex flex-col gap-2">
                 <Link href={'/'} className={pathname === '/' ? activeLink : inactiveLink}>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={pathname === '/' ? activeIcon : inactiveIcon}>
@@ -43,18 +43,17 @@ export default function Nav({show}) {
 
                 <Link href={'/orders'} className={pathname.includes('/orders') ? activeLink : inactiveLink}>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={pathname.includes('/orders') ? activeIcon : inactiveIcon}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 4.5h10.5M9 4.5h-.008v.008H9V4.5Zm6 0h-.008v.008H15V4.5ZM9.75 9h4.5m-4.5 3h4.5m-9 8.25V7.153c0-.65 0-.975.092-1.231a1.125 1.125 0 0 1 .63-.63C6.627 5.25 6.953 5.25 7.602 5.25h8.796c.65 0 .975 0 1.231.092.29.124.506.34.63.63.092.256.092.582.092 1.231v13.097l-3.9-2.028c-.274-.142-.41-.213-.553-.24a1.124 1.124 0 0 0-.396 0c-.143.027-.279.098-.553.24l-3.9 2.028Z" />
                     </svg>
                     Orders
                 </Link>
 
 
-                <Link href={'/settings'} className={pathname.includes('/settings') ? activeLink : inactiveLink}>
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={pathname.includes('/orders') ? activeIcon : inactiveIcon}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 0 1 1.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.806-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.559.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.894.149c-.424.07-.764.383-.929.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 0 1-1.449.12l-.738-.527c-.35-.25-.806-.272-1.203-.107-.398.165-.71.505-.781.929l-.149.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 0 1-.12-1.45l.527-.737c.25-.35.272-.806.108-1.204-.165-.397-.506-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.165-.398.143-.854-.108-1.204l-.526-.738a1.125 1.125 0 0 1 .12-1.45l.773-.773a1.125 1.125 0 0 1 1.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894Z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                <Link href={'/users'} className={pathname.includes('/settings') ? activeLink : inactiveLink}>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={pathname.includes('/settings') ? activeIcon : inactiveIcon}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0zM4.5 19.5a8.25 8.25 0 0 1 15 0" />
                     </svg>
-                    Settings
+                    Users
                 </Link>
 
                 <button onClick={() => signOut()} className={inactiveLink}>
