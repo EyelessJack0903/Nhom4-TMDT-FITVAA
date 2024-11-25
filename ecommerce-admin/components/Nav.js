@@ -41,6 +41,13 @@ export default function Nav({ show }) {
                     Categories
                 </Link>
 
+                <Link href={'/brands'} className={pathname.includes('/brands') ? activeLink : inactiveLink}>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={pathname.includes('/brands') ? activeIcon : inactiveIcon}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 14v7h6v-7M3 10l9-7 9 7M4 10h16v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V10z" />
+                    </svg>
+                    Brand
+                </Link>
+
                 <Link href={'/orders'} className={pathname.includes('/orders') ? activeLink : inactiveLink}>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={pathname.includes('/orders') ? activeIcon : inactiveIcon}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 4.5h10.5M9 4.5h-.008v.008H9V4.5Zm6 0h-.008v.008H15V4.5ZM9.75 9h4.5m-4.5 3h4.5m-9 8.25V7.153c0-.65 0-.975.092-1.231a1.125 1.125 0 0 1 .63-.63C6.627 5.25 6.953 5.25 7.602 5.25h8.796c.65 0 .975 0 1.231.092.29.124.506.34.63.63.092.256.092.582.092 1.231v13.097l-3.9-2.028c-.274-.142-.41-.213-.553-.24a1.124 1.124 0 0 0-.396 0c-.143.027-.279.098-.553.24l-3.9 2.028Z" />
@@ -48,9 +55,8 @@ export default function Nav({ show }) {
                     Orders
                 </Link>
 
-
-                <Link href={'/users'} className={pathname.includes('/settings') ? activeLink : inactiveLink}>
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={pathname.includes('/settings') ? activeIcon : inactiveIcon}>
+                <Link href={'/users'} className={pathname.includes('/users') ? activeLink : inactiveLink}>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={pathname.includes('/users') ? activeIcon : inactiveIcon}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0zM4.5 19.5a8.25 8.25 0 0 1 15 0" />
                     </svg>
                     Users

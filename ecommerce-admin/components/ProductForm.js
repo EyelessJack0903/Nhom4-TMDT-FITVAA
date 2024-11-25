@@ -13,6 +13,7 @@ export default function ProductForm({
     category: assignedCategory,
     properties: assignedProperties,
     detailedSpecs: existingDetailedSpecs,
+    brand: assignedBrand,
 }) {
     const [title, setTitle] = useState(existingTitle || "");
     const [description, setDescription] = useState(existingDescription || "");
@@ -26,6 +27,8 @@ export default function ProductForm({
     const [isUploading, setIsUploading] = useState(false);
     const [categories, setCategories] = useState([]);
     const [showDetailedSpecs, setShowDetailedSpecs] = useState(false);
+    const [brands, setBrands] = useState([]);
+    const [selectedBrand, setSelectedBrand] = useState(assignedBrand || "");
     const [detailedSpecs, setDetailedSpecs] = useState(
         existingDetailedSpecs || {
             CPU: "",
@@ -43,10 +46,21 @@ export default function ProductForm({
 
     // Fetch categories when component mounts
     useEffect(() => {
-        axios.get("/api/categories").then((result) => {
-            setCategories(result.data);
-        });
-    }, []);
+        async function fetchData() {
+            const categoriesRes = await axios.get("/api/categories");
+            setCategories(categoriesRes.data);
+
+            const brandsRes = await axios.get("/api/brands");
+            setBrands(brandsRes.data);
+
+            // Gán thương hiệu đã chọn nếu có
+            if (assignedBrand) {
+                setSelectedBrand(assignedBrand);
+            }
+        }
+        fetchData();
+    }, [assignedBrand]);
+
 
     // Save product data
     async function saveProduct(ev) {
@@ -59,8 +73,8 @@ export default function ProductForm({
             category,
             properties: productProperties,
             detailedSpecs,
+            brand: selectedBrand,
         };
-        console.log("Sending Data:", data); // Kiểm tra dữ liệu gửi
         if (_id) {
             await axios.put("/api/products", { ...data, _id });
         } else {
@@ -111,15 +125,20 @@ export default function ProductForm({
     const propertiesToFill = [];
     if (categories.length > 0 && category) {
         let catInfo = categories.find(({ _id }) => _id === category);
-        propertiesToFill.push(...catInfo.properties);
+        if (catInfo && catInfo.properties) {
+            propertiesToFill.push(...catInfo.properties);
+        }
         while (catInfo?.parent?._id) {
             const parentCat = categories.find(
                 ({ _id }) => _id === catInfo?.parent?._id
             );
-            propertiesToFill.push(...parentCat.properties);
+            if (parentCat && parentCat.properties) {
+                propertiesToFill.push(...parentCat.properties);
+            }
             catInfo = parentCat;
         }
     }
+
 
     // Remove individual image
     function removeImage(link) {
@@ -160,13 +179,28 @@ export default function ProductForm({
                 onChange={(ev) => setCategory(ev.target.value)}
                 className="mb-4 p-2 w-full border rounded"
             >
-                <option value="">Uncategorized</option>
+                <option value="">None</option>
                 {categories.length > 0 &&
                     categories.map((c) => (
                         <option key={c._id} value={c._id}>
                             {c.name}
                         </option>
                     ))}
+            </select>
+
+            {/* Brand Selection */}
+            <label className="block mb-2 font-medium">Thương hiệu</label>
+            <select
+                value={selectedBrand}
+                onChange={(ev) => setSelectedBrand(ev.target.value)}
+                className="mb-4 p-2 w-full border rounded"
+            >
+                <option value="">Chọn thương hiệu</option>
+                {brands.map((brand) => (
+                    <option key={brand._id} value={brand._id}>
+                        {brand.name}
+                    </option>
+                ))}
             </select>
 
             {/* Product Properties */}
