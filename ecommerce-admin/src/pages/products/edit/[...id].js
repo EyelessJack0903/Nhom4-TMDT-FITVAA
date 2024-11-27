@@ -4,15 +4,15 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import ProductForm from "../../../../components/ProductForm";
 
-export default function EditProductPage(){
+export default function EditProductPage() {
     const [productInfo, setProductInfo] = useState(null);
     const router = useRouter();
-    const {id} = router.query;
+    const { id } = router.query;
     useEffect(() => {
-        if(!id){
+        if (!id) {
             return;
         }
-        axios.get('/api/products?id='+id).then(response =>{
+        axios.get('/api/products?id=' + id).then(response => {
             setProductInfo(response.data);
         })
     }, [id])
@@ -20,8 +20,13 @@ export default function EditProductPage(){
         <Layout>
             <h1>Chỉnh sửa</h1>
             {productInfo && (
-                <ProductForm{...productInfo} />
-            )}  
+                <ProductForm
+                    {...productInfo}
+                    assignedBrand={productInfo.brand}
+                    assignedSubBrand={productInfo.subBrand}
+                    assignedStock={productInfo.stock}
+                />
+            )}
         </Layout>
     )
 }

@@ -14,6 +14,8 @@ export default function ProductForm({
     properties: assignedProperties,
     detailedSpecs: existingDetailedSpecs,
     brand: assignedBrand,
+    subBrand: assignedSubBrand, // Nhận subBrand
+    stock: existingStock,
 }) {
     const [title, setTitle] = useState(existingTitle || "");
     const [description, setDescription] = useState(existingDescription || "");
@@ -29,6 +31,10 @@ export default function ProductForm({
     const [showDetailedSpecs, setShowDetailedSpecs] = useState(false);
     const [brands, setBrands] = useState([]);
     const [selectedBrand, setSelectedBrand] = useState(assignedBrand || "");
+    const [subBrands, setSubBrands] = useState([]);
+    const [selectedSubBrand, setSelectedSubBrand] = useState(
+        assignedSubBrand || ""
+    );
     const [detailedSpecs, setDetailedSpecs] = useState(
         existingDetailedSpecs || {
             CPU: "",
@@ -42,10 +48,12 @@ export default function ProductForm({
             "Xuất xứ": "",
         }
     );
+    const [stock, setStock] = useState(existingStock || "");
     const router = useRouter();
 
     // Fetch categories when component mounts
     useEffect(() => {
+        console.log("Selected SubBrand:", selectedSubBrand);
         async function fetchData() {
             const categoriesRes = await axios.get("/api/categories");
             setCategories(categoriesRes.data);
@@ -53,14 +61,34 @@ export default function ProductForm({
             const brandsRes = await axios.get("/api/brands");
             setBrands(brandsRes.data);
 
-            // Gán thương hiệu đã chọn nếu có
+            // Gán danh sách subBrand nếu đang chỉnh sửa
             if (assignedBrand) {
-                setSelectedBrand(assignedBrand);
+                const brand = brandsRes.data.find((b) => b._id === assignedBrand);
+                if (brand?.subBrands?.length > 0) {
+                    setSubBrands(brand.subBrands);
+                    setSelectedSubBrand(assignedSubBrand || "");
+                }
             }
         }
         fetchData();
-    }, [assignedBrand]);
+    }, [assignedBrand, assignedSubBrand], [selectedSubBrand]);
 
+    const handleSubBrandChange = (subBrandId) => {
+        setSelectedSubBrand(subBrandId); // Cập nhật ID của SubBrand
+    };
+
+
+    const handleBrandChange = (brandId) => {
+        setSelectedBrand(brandId);
+        const selectedBrand = brands.find((brand) => brand._id === brandId);
+        if (selectedBrand?.subBrands?.length > 0) {
+            setSubBrands(selectedBrand.subBrands);
+            setSelectedSubBrand("");
+        } else {
+            setSubBrands([]);
+            setSelectedSubBrand("");
+        }
+    };
 
     // Save product data
     async function saveProduct(ev) {
@@ -74,14 +102,23 @@ export default function ProductForm({
             properties: productProperties,
             detailedSpecs,
             brand: selectedBrand,
+            subBrand: selectedSubBrand, // Gửi toàn bộ object subBrand
+            stock: Number(stock),
         };
-        if (_id) {
-            await axios.put("/api/products", { ...data, _id });
-        } else {
-            await axios.post("/api/products", data);
+
+        console.log("Data to send:", data); // Log kiểm tra
+        try {
+            if (_id) {
+                await axios.put("/api/products", { ...data, _id });
+            } else {
+                await axios.post("/api/products", data);
+            }
+            router.push("/products");
+        } catch (error) {
+            console.error("Error saving product:", error);
         }
-        setGoToProducts(true);
     }
+
 
     if (goToProducts) {
         router.push("/products");
@@ -139,17 +176,13 @@ export default function ProductForm({
         }
     }
 
-
     // Remove individual image
     function removeImage(link) {
         setImages((oldImages) => oldImages.filter((img) => img !== link));
     }
 
     return (
-        <form
-            onSubmit={saveProduct}
-            className="p-4 bg-white border rounded shadow-sm"
-        >
+        <form onSubmit={saveProduct} className="p-4 bg-white border rounded shadow-sm">
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-semibold">Chi tiết sản phẩm</h2>
@@ -192,7 +225,7 @@ export default function ProductForm({
             <label className="block mb-2 font-medium">Thương hiệu</label>
             <select
                 value={selectedBrand}
-                onChange={(ev) => setSelectedBrand(ev.target.value)}
+                onChange={(ev) => handleBrandChange(ev.target.value)}
                 className="mb-4 p-2 w-full border rounded"
             >
                 <option value="">Chọn thương hiệu</option>
@@ -202,6 +235,25 @@ export default function ProductForm({
                     </option>
                 ))}
             </select>
+
+            {/* Sub-Brand Selection */}
+            {subBrands.length > 0 && (
+                <>
+                    <label className="block mb-2 font-medium">Thương hiệu con</label>
+                    <select
+                        value={selectedSubBrand || ""} // Dùng ID làm giá trị
+                        onChange={(e) => handleSubBrandChange(e.target.value)} // Cập nhật ID
+                        className="mb-4 p-2 w-full border rounded"
+                    >
+                        <option value="">Chọn thương hiệu con</option>
+                        {subBrands.map((subBrand) => (
+                            <option key={subBrand._id} value={subBrand._id}>
+                                {subBrand.name}
+                            </option>
+                        ))}
+                    </select>
+                </>
+            )}
 
             {/* Product Properties */}
             {propertiesToFill.length > 0 &&
@@ -285,6 +337,16 @@ export default function ProductForm({
                 ></textarea>
             </div>
 
+            {/* Product Stock */}
+            <label className="block mb-2 font-medium">Số lượng sản phẩm</label>
+            <input
+                type="number"
+                placeholder="Nhập số lượng sản phẩm"
+                value={stock}
+                onChange={(ev) => setStock(ev.target.value)} 
+                className="mb-4 p-2 w-full border rounded"
+            />
+
             {/* Product Price */}
             <label className="block mb-2 font-medium">Giá sản phẩm (VND)</label>
             <input
@@ -317,10 +379,7 @@ export default function ProductForm({
             )}
 
             {/* Save Button */}
-            <button
-                type="submit"
-                className="btn-primary bg-blue-500 text-white px-4 py-2 rounded"
-            >
+            <button type="submit" className="btn-primary bg-blue-500 text-white px-4 py-2 rounded">
                 Lưu sản phẩm
             </button>
         </form>

@@ -1,11 +1,11 @@
 import { mongooseConnect } from "../../../../lib/mongoose";
-import Brand from "../../../../models/Brand";
+import { Brand } from "../../../../models/Brand"; // Chú ý: Đảm bảo Brand được nhập đúng
 import multiparty from "multiparty";
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import fs from "fs";
 import mime from "mime-types";
 
-const bucketName = "nhom4-next-ecommerce"; 
+const bucketName = "nhom4-next-ecommerce";
 
 export const config = {
   api: {
@@ -14,12 +14,20 @@ export const config = {
 };
 
 export default async function handler(req, res) {
-  await mongooseConnect();
+  await mongooseConnect(); // Kết nối MongoDB
 
   const { id } = req.query;
 
-  if (req.method === "PUT") {
-    try {
+  try {
+    if (req.method === "GET") {
+      const brand = await Brand.findById(id);
+      if (!brand) {
+        return res.status(404).json({ error: "Brand not found" });
+      }
+      return res.status(200).json(brand);
+    }
+
+    if (req.method === "PUT") {
       const form = new multiparty.Form();
       const { fields, files } = await new Promise((resolve, reject) => {
         form.parse(req, (err, fields, files) => {
@@ -27,6 +35,11 @@ export default async function handler(req, res) {
           resolve({ fields, files });
         });
       });
+
+      const brand = await Brand.findById(id);
+      if (!brand) {
+        return res.status(404).json({ error: "Brand not found" });
+      }
 
       const client = new S3Client({
         region: "ap-southeast-2",
@@ -36,7 +49,7 @@ export default async function handler(req, res) {
         },
       });
 
-      let logoUrl = "";
+      let logoUrl = brand.logo;
       if (files.logo) {
         const file = files.logo[0];
         const ext = mime.extension(file.headers["content-type"]);
@@ -53,36 +66,27 @@ export default async function handler(req, res) {
         logoUrl = `https://${bucketName}.s3.amazonaws.com/${newFileName}`;
       }
 
-      const brand = await Brand.findById(id);
-      if (!brand) {
-        return res.status(404).json({ error: "Brand not found" });
-      }
+      const subBrands = fields.subBrands ? JSON.parse(fields.subBrands[0]) : [];
 
       brand.name = fields.name[0];
-      if (logoUrl) {
-        brand.logo = logoUrl;
-      }
+      brand.logo = logoUrl;
+      brand.subBrands = subBrands; // Cập nhật subBrands
       await brand.save();
 
-      return res.json(brand);
-    } catch (error) {
-      console.error("Error updating brand:", error);
-      return res.status(500).json({ error: "Internal Server Error" });
+      return res.status(200).json(brand);
     }
-  }
 
-  if (req.method === "DELETE") {
-    try {
+    if (req.method === "DELETE") {
       const brand = await Brand.findByIdAndDelete(id);
       if (!brand) {
         return res.status(404).json({ error: "Brand not found" });
       }
-      return res.json({ success: true });
-    } catch (error) {
-      console.error("Error deleting brand:", error);
-      return res.status(500).json({ error: "Internal Server Error" });
+      return res.status(200).json({ success: true });
     }
-  }
 
-  res.status(405).json({ error: "Method not allowed" });
+    res.status(405).json({ error: "Method not allowed" });
+  } catch (error) {
+    console.error("Error in /api/brands/[id]:", error);
+    return res.status(500).json({ error: "Internal Server Error", details: error.message });
+  }
 }

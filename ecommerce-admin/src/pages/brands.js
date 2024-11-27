@@ -5,7 +5,7 @@ export default function BrandsPage() {
   return (
     <Layout>
     <div>
-      <h1 className="text-2xl font-bold mb-6">Manage Brands</h1>
+      <h1 className="text-2xl font-bold mb-6">Quản lý thương hiệu</h1>
       <BrandForm />
     </div>
     </Layout>

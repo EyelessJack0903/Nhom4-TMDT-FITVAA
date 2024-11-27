@@ -7,6 +7,8 @@ export default function BrandsPage() {
     const [brandList, setBrandList] = useState([]);
     const [editingBrand, setEditingBrand] = useState(null);
     const [previewLogo, setPreviewLogo] = useState(null);
+    const [subBrands, setSubBrands] = useState([]);
+    const [newSubBrandName, setNewSubBrandName] = useState("");
 
     // Fetch existing brands
     useEffect(() => {
@@ -21,11 +23,10 @@ export default function BrandsPage() {
         e.preventDefault();
         const formData = new FormData();
         formData.append("name", brandName);
-
-        // Nếu có logo mới, thêm vào form data
         if (brandLogo) {
             formData.append("logo", brandLogo);
         }
+        formData.append("subBrands", JSON.stringify(subBrands));
 
         try {
             if (editingBrand) {
@@ -46,12 +47,27 @@ export default function BrandsPage() {
 
             setBrandName("");
             setBrandLogo(null);
-            setPreviewLogo(null); // Reset preview logo
+            setPreviewLogo(null);
             setEditingBrand(null);
+            setSubBrands([]); // Reset sub-brands
+            
         } catch (error) {
             console.error("Error saving brand:", error.response?.data || error.message);
             alert("Không thể lưu thương hiệu. Vui lòng kiểm tra log để biết thêm chi tiết.");
         }
+    };
+
+    // Thêm sub-brand mới
+    const handleAddSubBrand = () => {
+        if (newSubBrandName.trim()) {
+            setSubBrands([...subBrands, { name: newSubBrandName }]);
+            setNewSubBrandName(""); // Reset input
+        }
+    };
+
+    // Xóa sub-brand
+    const handleDeleteSubBrand = (index) => {
+        setSubBrands(subBrands.filter((_, i) => i !== index));
     };
 
     // Handle edit
@@ -60,6 +76,7 @@ export default function BrandsPage() {
         setBrandName(brand.name);
         setBrandLogo(null); // Xóa file mới
         setPreviewLogo(brand.logo); // Thêm biến preview logo để hiển thị ảnh cũ
+        setSubBrands(brand.subBrands || []); // Load sub-brands nếu có
     };
 
     // Handle delete
@@ -109,35 +126,55 @@ export default function BrandsPage() {
                             className="w-full p-2 border rounded-md"
                         />
                     </div>
+                    <div>
+                        <label className="block font-medium mb-1">Thương hiệu con</label>
+                        <div className="space-y-2">
+                            {subBrands.map((subBrand, index) => (
+                                <div key={index} className="flex items-center space-x-2">
+                                    <span>{subBrand.name}</span>
+                                    <button
+                                        type="button"
+                                        onClick={() => handleDeleteSubBrand(index)}
+                                        className="text-red-500"
+                                    >
+                                        Xóa
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                        <div className="flex items-center space-x-2 mt-2">
+                            <input
+                                type="text"
+                                placeholder="Tên thương hiệu con. Ví dụ: Asus Vivobook, Legion, ..."
+                                value={newSubBrandName}
+                                onChange={(e) => setNewSubBrandName(e.target.value)}
+                                className="w-full p-2 border rounded-md"
+                            />
+                            <button
+                                type="button"
+                                onClick={handleAddSubBrand}
+                                className="bg-blue-500 text-white px-4 py-2 rounded-md"
+                            >
+                                Thêm
+                            </button>
+                        </div>
+                    </div>
                     <button
                         type="submit"
                         className="bg-purple-800 text-white px-4 py-2 rounded-md hover:bg-blue-600"
                     >
                         {editingBrand ? "Cập nhật" : "Thêm"}
                     </button>
-                    {editingBrand && (
-                        <button
-                            type="button"
-                            onClick={() => {
-                                setEditingBrand(null);
-                                setBrandName("");
-                                setBrandLogo(null);
-                            }}
-                            className="ml-4 bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600"
-                        >
-                            Hủy
-                        </button>
-                    )}
                 </form>
             </div>
 
-            {/* Display Brand List */}
-            <h2 className="text-xl font-semibold mt-8 mb-4">Các thương hiệu</h2>
+            <h2 className="text-xl font-semibold mt-8 mb-4">Danh sách thương hiệu</h2>
             <table className="w-full border-collapse bg-white shadow-md rounded-md">
                 <thead>
                     <tr className="bg-gray-100 border-b">
                         <th className="text-left p-4">Logo thương hiệu</th>
                         <th className="text-left p-4">Tên thương hiệu</th>
+                        <th className="text-left p-4">Thương hiệu con</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -153,6 +190,13 @@ export default function BrandsPage() {
                                 </div>
                             </td>
                             <td className="p-4">{brand.name}</td>
+                            <td className="p-4">
+                                {brand.subBrands?.map((subBrand, index) => (
+                                    <span key={index} className="block">
+                                        {subBrand.name}
+                                    </span>
+                                ))}
+                            </td>
                             <td className="p-4 flex space-x-4">
                                 <button
                                     onClick={() => handleEdit(brand)}

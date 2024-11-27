@@ -10,6 +10,11 @@ const ProductSchema = new Schema(
     properties: { type: Object },
     detailedSpecs: { type: Object },
     brand: { type: mongoose.Types.ObjectId, ref: "Brand" },
+    subBrand: {
+      _id: { type: mongoose.Types.ObjectId }, 
+      name: { type: String }, 
+    },
+    stock: { type: Number, required: true },
   },
   {
     timestamps: true,
@@ -17,3 +22,7 @@ const ProductSchema = new Schema(
 );
 
 export const Product = models.Product || model("Product", ProductSchema);
+
+
+
+
