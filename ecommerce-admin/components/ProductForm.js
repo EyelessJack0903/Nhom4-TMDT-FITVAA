@@ -48,7 +48,7 @@ export default function ProductForm({
             "Xuất xứ": "",
         }
     );
-    const [stock, setStock] = useState(existingStock || "");
+    const [stock, setStock] = useState(existingStock !== null && existingStock !== undefined ? existingStock : 0);
     const router = useRouter();
 
     // Fetch categories when component mounts
