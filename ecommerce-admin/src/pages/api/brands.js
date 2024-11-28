@@ -4,6 +4,7 @@ import fs from "fs";
 import mime from "mime-types";
 import { mongooseConnect } from "../../../lib/mongoose";
 import { Brand } from "../../../models/Brand";
+import mongoose from "mongoose"; // Đảm bảo import mongoose
 
 const bucketName = "nhom4-next-ecommerce";
 
@@ -51,7 +52,13 @@ export default async function handler(req, res) {
         logoUrl = `https://${bucketName}.s3.amazonaws.com/${newFileName}`;
       }
 
-      const subBrands = fields.subBrands ? JSON.parse(fields.subBrands[0]) : [];
+      const subBrands = fields.subBrands ? JSON.parse(fields.subBrands[0]).map(subBrand => {
+        return {
+          ...subBrand,
+          _id: mongoose.Types.ObjectId.isValid(subBrand._id) ? subBrand._id : new mongoose.Types.ObjectId()
+        };
+      }) : [];
+      
 
       const brand = await Brand.create({
         name: fields.name[0],
@@ -104,7 +111,14 @@ export default async function handler(req, res) {
         logoUrl = `https://${bucketName}.s3.amazonaws.com/${newFileName}`;
       }
 
-      const subBrands = fields.subBrands ? JSON.parse(fields.subBrands[0]) : [];
+      // Xử lý subBrands để đảm bảo _id hợp lệ
+      const subBrands = fields.subBrands ? JSON.parse(fields.subBrands[0]).map(subBrand => {
+        // Nếu không có _id, tạo ObjectId mới
+        return {
+          ...subBrand,
+          _id: subBrand._id ? subBrand._id : new mongoose.Types.ObjectId()
+        };
+      }) : [];
 
       brand.name = fields.name[0];
       brand.logo = logoUrl;

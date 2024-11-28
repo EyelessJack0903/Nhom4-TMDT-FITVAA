@@ -50,7 +50,7 @@ export default function BrandsPage() {
             setPreviewLogo(null);
             setEditingBrand(null);
             setSubBrands([]); // Reset sub-brands
-            
+
         } catch (error) {
             console.error("Error saving brand:", error.response?.data || error.message);
             alert("Không thể lưu thương hiệu. Vui lòng kiểm tra log để biết thêm chi tiết.");
@@ -60,7 +60,8 @@ export default function BrandsPage() {
     // Thêm sub-brand mới
     const handleAddSubBrand = () => {
         if (newSubBrandName.trim()) {
-            setSubBrands([...subBrands, { name: newSubBrandName }]);
+            const newSubBrand = { name: newSubBrandName, _id: new Date().toISOString() };
+            setSubBrands([...subBrands, newSubBrand]);
             setNewSubBrandName(""); // Reset input
         }
     };

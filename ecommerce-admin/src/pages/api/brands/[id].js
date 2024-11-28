@@ -1,34 +1,24 @@
-import { mongooseConnect } from "../../../../lib/mongoose";
-import { Brand } from "../../../../models/Brand"; // Chú ý: Đảm bảo Brand được nhập đúng
 import multiparty from "multiparty";
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import fs from "fs";
 import mime from "mime-types";
-
+import mongoose from "mongoose"; // Đảm bảo import mongoose
+import { mongooseConnect } from "../../../../lib/mongoose";
+import { Brand } from "../../../../models/Brand";
 const bucketName = "nhom4-next-ecommerce";
-
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
 
 export default async function handler(req, res) {
   await mongooseConnect(); // Kết nối MongoDB
 
-  const { id } = req.query;
-
   try {
     if (req.method === "GET") {
-      const brand = await Brand.findById(id);
-      if (!brand) {
-        return res.status(404).json({ error: "Brand not found" });
-      }
-      return res.status(200).json(brand);
+      const brands = await Brand.find();
+      return res.status(200).json(brands);
     }
 
-    if (req.method === "PUT") {
+    if (req.method === "POST") {
       const form = new multiparty.Form();
+
       const { fields, files } = await new Promise((resolve, reject) => {
         form.parse(req, (err, fields, files) => {
           if (err) reject(err);
@@ -36,7 +26,55 @@ export default async function handler(req, res) {
         });
       });
 
+      const client = new S3Client({
+        region: "ap-southeast-2",
+        credentials: {
+          accessKeyId: process.env.S3_ACCESS_KEY,
+          secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
+        },
+      });
+
+      let logoUrl = "";
+      if (files.logo) {
+        const file = files.logo[0];
+        const ext = mime.extension(file.headers["content-type"]);
+        const newFileName = `${Date.now()}.${ext}`;
+        await client.send(
+          new PutObjectCommand({
+            Bucket: bucketName,
+            Key: newFileName,
+            Body: fs.readFileSync(file.path),
+            ContentType: file.headers["content-type"],
+            ACL: "public-read",
+          })
+        );
+        logoUrl = `https://${bucketName}.s3.amazonaws.com/${newFileName}`;
+      }
+
+      const subBrands = fields.subBrands ? JSON.parse(fields.subBrands[0]) : [];
+
+      const brand = await Brand.create({
+        name: fields.name[0],
+        logo: logoUrl,
+        subBrands,
+      });
+
+      res.status(201).json(brand);
+    }
+
+    if (req.method === "PUT") {
+      const form = new multiparty.Form();
+
+      const { fields, files } = await new Promise((resolve, reject) => {
+        form.parse(req, (err, fields, files) => {
+          if (err) reject(err);
+          resolve({ fields, files });
+        });
+      });
+
+      const { id } = req.query;
       const brand = await Brand.findById(id);
+
       if (!brand) {
         return res.status(404).json({ error: "Brand not found" });
       }
@@ -66,27 +104,41 @@ export default async function handler(req, res) {
         logoUrl = `https://${bucketName}.s3.amazonaws.com/${newFileName}`;
       }
 
-      const subBrands = fields.subBrands ? JSON.parse(fields.subBrands[0]) : [];
+      // Kiểm tra và đảm bảo ObjectId hợp lệ cho mỗi subBrand
+      const subBrands = fields.subBrands ? JSON.parse(fields.subBrands[0]).map(subBrand => {
+        // Nếu _id không hợp lệ, tạo mới ObjectId
+        return {
+          ...subBrand,
+          _id: mongoose.Types.ObjectId.isValid(subBrand._id) ? subBrand._id : new mongoose.Types.ObjectId()
+        };
+      }) : [];
 
       brand.name = fields.name[0];
       brand.logo = logoUrl;
-      brand.subBrands = subBrands; // Cập nhật subBrands
+      brand.subBrands = subBrands;
       await brand.save();
 
-      return res.status(200).json(brand);
+      res.status(200).json(brand);
     }
 
     if (req.method === "DELETE") {
+      const { id } = req.query;
+
       const brand = await Brand.findByIdAndDelete(id);
       if (!brand) {
         return res.status(404).json({ error: "Brand not found" });
       }
-      return res.status(200).json({ success: true });
-    }
 
-    res.status(405).json({ error: "Method not allowed" });
+      res.status(200).json({ success: true });
+    }
   } catch (error) {
-    console.error("Error in /api/brands/[id]:", error);
-    return res.status(500).json({ error: "Internal Server Error", details: error.message });
+    console.error("Error in API /api/brands:", error);
+    res.status(500).json({ error: "Internal Server Error", details: error.message });
   }
 }
+
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
