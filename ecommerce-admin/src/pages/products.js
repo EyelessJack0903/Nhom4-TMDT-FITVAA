@@ -41,6 +41,17 @@ export default function Products() {
         }
     };
 
+    // Hàm kiểm tra trạng thái sản phẩm
+    const getProductStatus = (stock) => {
+        if (stock > 3) {
+            return <span style={{ color: "green" }}>Còn hàng</span>;
+        } else if (stock > 0 && stock <= 3) {
+            return <span style={{ color: "orange" }}>Sắp hết hàng</span>;
+        } else {
+            return <span style={{ color: "red" }}>Hết hàng</span>;
+        }
+    };
+
     return (
         <Layout>
             {/* Ô tìm kiếm */}
@@ -71,6 +82,8 @@ export default function Products() {
                 <thead>
                     <tr>
                         <td>Tên sản phẩm</td>
+                        <td>Số lượng</td>
+                        <td>Trạng thái</td>
                         <td></td>
                     </tr>
                 </thead>
@@ -78,6 +91,8 @@ export default function Products() {
                     {currentProducts.map((product) => (
                         <tr key={product._id}>
                             <td>{product.title}</td>
+                            <td>{product.stock}</td> 
+                            <td>{getProductStatus(product.stock)}</td>
                             <td>
                                 <Link className="btn-default" href={`/products/edit/${product._id}`}>
                                     <svg
