@@ -3,6 +3,7 @@ import Layout from "../../components/Layout";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { FaMoneyBillWave, FaUsers, FaBox, FaShoppingCart } from "react-icons/fa"; 
+import RevenueChart from "../../components/RevenueChart";
 
 export default function Home() {
   const { data: session } = useSession();
@@ -13,11 +14,17 @@ export default function Home() {
   const [totalProducts, setTotalProducts] = useState(0); 
   const [totalOrders, setTotalOrders] = useState(0); 
 
-  // Lấy thông tin ngày, tháng, năm từ máy
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  
   const currentDate = new Date();
   const currentDay = currentDate.getDate();
   const currentMonth = currentDate.getMonth() + 1; 
   const currentYear = currentDate.getFullYear();
+
+  const yearsList = [];
+  for (let i = currentYear - 5; i <= currentYear + 5; i++) {
+    yearsList.push(i);
+  }
 
   // Hàm lấy doanh thu từ API
   const fetchRevenue = async () => {
@@ -68,6 +75,10 @@ export default function Home() {
     } catch (error) {
       console.error("Error fetching total orders:", error);
     }
+  };
+
+  const handleYearChange = (e) => {
+    setSelectedYear(e.target.value); 
   };
 
   useEffect(() => {
@@ -165,6 +176,28 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      {/* Biểu đồ doanh thu */}
+      <div className="flex justify-between items-center p-4">
+        <h3 className="text-xl font-bold">Biểu đồ doanh thu</h3>
+        <div className="w-36">
+          <label htmlFor="yearSelect" className="block text-sm font-medium text-gray-700">Chọn năm</label>
+          <select
+            id="yearSelect"
+            name="year"
+            className="block w-full mt-1 text-gray-900 bg-white border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            value={selectedYear}
+            onChange={handleYearChange}
+          >
+            {yearsList.map(year => (
+              <option key={year} value={year}>{year}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      {/* Biểu đồ revenue */}
+      <RevenueChart selectedYear={selectedYear} />
     </Layout>
   );
 }
