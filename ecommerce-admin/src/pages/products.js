@@ -56,7 +56,7 @@ export default function Products() {
         <Layout>
             {/* Ô tìm kiếm */}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-                <h1 style={{ margin: 0 }}>Products</h1>
+                <h1 style={{ margin: 0 }}>Sản phẩm</h1>
                 <input
                     type="text"
                     placeholder="Tìm kiếm theo tên sản phẩm..."
@@ -74,13 +74,14 @@ export default function Products() {
 
             {/* Nút thêm sản phẩm */}
             <Link className="btn-primary" href="/products/new">
-                Add new product
+                Thêm sản phẩm mới
             </Link>
 
             {/* Bảng sản phẩm */}
             <table className="basic mt-4">
                 <thead>
                     <tr>
+                        <td>STT</td> 
                         <td>Tên sản phẩm</td>
                         <td>Số lượng</td>
                         <td>Trạng thái</td>
@@ -88,10 +89,11 @@ export default function Products() {
                     </tr>
                 </thead>
                 <tbody>
-                    {currentProducts.map((product) => (
+                    {currentProducts.map((product, index) => (
                         <tr key={product._id}>
+                            <td>{index + 1 + (currentPage - 1) * productsPerPage}</td> 
                             <td>{product.title}</td>
-                            <td>{product.stock}</td> 
+                            <td>{product.stock}</td>
                             <td>{getProductStatus(product.stock)}</td>
                             <td>
                                 <Link className="btn-default" href={`/products/edit/${product._id}`}>
@@ -124,8 +126,7 @@ export default function Products() {
                                         <path
                                             strokeLinecap="round"
                                             strokeLinejoin="round"
-                                            d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
-                                        />
+                                            d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0=" />
                                     </svg>
                                     Delete
                                 </Link>

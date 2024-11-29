@@ -55,7 +55,7 @@ export default function UsersPage() {
   return (
     <Layout>
       <div className="p-6 bg-white rounded-md shadow-md">
-        <h1 className="text-2xl font-bold mb-6">Danh sách người dùng</h1>
+        <h1 className="text-1xl mb-6">Danh sách người dùng</h1>
         <table className="table-auto w-full border-collapse bg-white shadow-md rounded-md">
           <thead>
             <tr className="bg-gray-100 border-b">
