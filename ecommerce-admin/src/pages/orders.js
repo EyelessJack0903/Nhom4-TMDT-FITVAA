@@ -9,14 +9,14 @@ export default function OrdersPage() {
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [ordersPerPage] = useState(5);
-  const [totalOrders, setTotalOrders] = useState(0); 
+  const [totalOrders, setTotalOrders] = useState(0);
 
   // Lấy dữ liệu từ API
   useEffect(() => {
     axios.get("/api/orders").then((response) => {
       setOrders(response.data);
-      setFilteredOrders(response.data); 
-      setTotalOrders(response.data.length); 
+      setFilteredOrders(response.data);
+      setTotalOrders(response.data.length);
     });
   }, []);
 
@@ -29,8 +29,8 @@ export default function OrdersPage() {
         order.email.toLowerCase().includes(searchQuery.toLowerCase())
     );
     setFilteredOrders(result);
-    setCurrentPage(1); 
-    setTotalOrders(result.length); 
+    setCurrentPage(1);
+    setTotalOrders(result.length);
   };
 
   // Tính toán các đơn hàng cần hiển thị
@@ -64,6 +64,8 @@ export default function OrdersPage() {
             <th>Ngày đặt</th>
             <th>Hóa đơn</th>
             <th>Sản phẩm</th>
+            <th>Tổng tiền</th>
+            <th>Thanh toán</th>
           </tr>
         </thead>
         <tbody>
@@ -84,10 +86,19 @@ export default function OrdersPage() {
                 <td>
                   {order.line_items.map((l, index) => (
                     <div key={index}>
-                      {l.price_data?.product_data.name} x {l.quantity}
+                      {l.price_data?.product_data.name} x {l.quantity} - {l.price_data?.unit_amount / 100}$
                       <br />
                     </div>
                   ))}
+                </td>
+                <td className="text-blue-500">
+                    {order.line_items
+                      .reduce((sum, l) => sum + (l.price_data?.unit_amount / 100) * l.quantity, 0)
+                      .toFixed(0)}
+                    $
+                </td>
+                <td className={order.paid ? 'text-green-600' : 'text-red-600'}>
+                  {order.paid ? 'Đã thanh toán' : 'Chưa thanh toán'}
                 </td>
               </tr>
             ))
