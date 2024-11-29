@@ -82,12 +82,18 @@ export default function BrandsPage() {
 
     // Handle delete
     const handleDelete = async (brandId) => {
-        if (confirm("Bạn có chắc chắn muốn xóa thương hiệu này?")) {
-            await axios.delete(`/api/brands/${brandId}`);
-            setBrandList((prev) => prev.filter((brand) => brand._id !== brandId));
+        if (window.confirm("Bạn có chắc chắn muốn xóa thương hiệu này?")) {
+            try {
+                await axios.delete(`/api/brands/${brandId}`);
+                setBrandList((prev) => prev.filter((brand) => brand._id !== brandId));
+                alert("Thương hiệu đã được xóa thành công.");
+                window.location.reload(); 
+            } catch (error) {
+                console.error("Error deleting brand:", error);
+                alert("Không thể xóa thương hiệu. Vui lòng kiểm tra log để biết thêm chi tiết.");
+            }
         }
     };
-
     return (
         <>
             <div className="bg-white p-6 rounded-md shadow-md">
