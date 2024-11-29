@@ -10,6 +10,10 @@ export default function BrandsPage() {
     const [subBrands, setSubBrands] = useState([]);
     const [newSubBrandName, setNewSubBrandName] = useState("");
 
+    // State for pagination
+    const [currentPage, setCurrentPage] = useState(1);
+    const brandsPerPage = 5; // Number of brands per page
+
     // Fetch existing brands
     useEffect(() => {
         async function fetchBrands() {
@@ -18,6 +22,11 @@ export default function BrandsPage() {
         }
         fetchBrands();
     }, []);
+
+    // Calculate the brands to display for the current page
+    const indexOfLastBrand = currentPage * brandsPerPage;
+    const indexOfFirstBrand = indexOfLastBrand - brandsPerPage;
+    const currentBrands = brandList.slice(indexOfFirstBrand, indexOfLastBrand);
 
     const handleSaveBrand = async (e) => {
         e.preventDefault();
@@ -45,12 +54,15 @@ export default function BrandsPage() {
                 setBrandList([...brandList, response.data]);
             }
 
+            // Reset các trường sau khi lưu thành công
             setBrandName("");
             setBrandLogo(null);
             setPreviewLogo(null);
             setEditingBrand(null);
-            setSubBrands([]); // Reset sub-brands
+            setSubBrands([]);
+            setNewSubBrandName("");
 
+            alert("Thương hiệu đã được lưu thành công.");
         } catch (error) {
             console.error("Error saving brand:", error.response?.data || error.message);
             alert("Không thể lưu thương hiệu. Vui lòng kiểm tra log để biết thêm chi tiết.");
@@ -85,15 +97,25 @@ export default function BrandsPage() {
         if (window.confirm("Bạn có chắc chắn muốn xóa thương hiệu này?")) {
             try {
                 await axios.delete(`/api/brands/${brandId}`);
+                // Cập nhật danh sách thương hiệu sau khi xóa
                 setBrandList((prev) => prev.filter((brand) => brand._id !== brandId));
                 alert("Thương hiệu đã được xóa thành công.");
-                window.location.reload(); 
             } catch (error) {
                 console.error("Error deleting brand:", error);
                 alert("Không thể xóa thương hiệu. Vui lòng kiểm tra log để biết thêm chi tiết.");
             }
         }
     };
+
+    // Pagination handlers
+    const handlePreviousPage = () => {
+        setCurrentPage(currentPage - 1);
+    };
+
+    const handleNextPage = () => {
+        setCurrentPage(currentPage + 1);
+    };
+
     return (
         <>
             <div className="bg-white p-6 rounded-md shadow-md">
@@ -160,7 +182,7 @@ export default function BrandsPage() {
                             <button
                                 type="button"
                                 onClick={handleAddSubBrand}
-                                className="bg-blue-500 text-white px-4 py-2 rounded-md"
+                                className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-yellow-500 mr-2 transition-colors duration-200"
                             >
                                 Thêm
                             </button>
@@ -168,9 +190,9 @@ export default function BrandsPage() {
                     </div>
                     <button
                         type="submit"
-                        className="bg-purple-800 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+                        className="bg-purple-800 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors duration-200"
                     >
-                        {editingBrand ? "Cập nhật" : "Thêm"}
+                        {editingBrand ? "Cập nhật" : "Thêm thương hiệu"}
                     </button>
                 </form>
             </div>
@@ -185,7 +207,7 @@ export default function BrandsPage() {
                     </tr>
                 </thead>
                 <tbody>
-                    {brandList.map((brand) => (
+                    {currentBrands.map((brand) => (
                         <tr key={brand._id} className="border-b hover:bg-gray-50">
                             <td className="p-4">
                                 <div className="h-16 w-16 flex items-center justify-center bg-gray-50 border rounded-md overflow-hidden">
@@ -198,30 +220,56 @@ export default function BrandsPage() {
                             </td>
                             <td className="p-4">{brand.name}</td>
                             <td className="p-4">
-                                {brand.subBrands?.map((subBrand, index) => (
-                                    <span key={index} className="block">
-                                        {subBrand.name}
-                                    </span>
-                                ))}
+                                {brand.subBrands?.length > 0 ? (
+                                    <ul>
+                                        {brand.subBrands.map((subBrand, idx) => (
+                                            <li key={idx}>{subBrand.name}</li>
+                                        ))}
+                                    </ul>
+                                ) : (
+                                    <span>Không có</span>
+                                )}
                             </td>
-                            <td className="p-4 flex space-x-4">
+                            <td className="p-4">
                                 <button
                                     onClick={() => handleEdit(brand)}
-                                    className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+                                    className="text-blue-900 border border-blue-500 px-4 py-2 rounded-md hover:text-white hover:bg-blue-500 mr-2 transition-colors duration-200"
                                 >
                                     Chỉnh sửa
                                 </button>
                                 <button
                                     onClick={() => handleDelete(brand._id)}
-                                    className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
+                                    className="text-white border border-red-500 px-4 py-2 rounded-md bg-red-500 hover:bg-white hover:text-red-500 transition-colors duration-200"
                                 >
                                     Xóa
                                 </button>
+
                             </td>
                         </tr>
                     ))}
                 </tbody>
             </table>
+
+            <div className="flex items-center justify-between mt-6">
+                <button
+                    onClick={handlePreviousPage}
+                    disabled={currentPage === 1}
+                    className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-blue-500 hover:text-white disabled:bg-gray-200 disabled:text-gray-500 transition-colors duration-200"
+                >
+                    Trang trước
+                </button>
+                <span className="text-lg">
+                    Trang {currentPage} / {Math.ceil(brandList.length / brandsPerPage)}
+                </span>
+                <button
+                    onClick={handleNextPage}
+                    disabled={currentPage === Math.ceil(brandList.length / brandsPerPage)}
+                    className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-blue-500 hover:text-white disabled:bg-gray-200 disabled:text-gray-500 transition-colors duration-200"
+                >
+                    Trang sau
+                </button>
+            </div>
+
         </>
     );
 }
